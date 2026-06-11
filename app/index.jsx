@@ -1,6 +1,7 @@
 import { Data } from "@/constants/Todos.jsx";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useRouter } from "expo-router";
 import { useContext, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +18,7 @@ export default function Index() {
 
   //Declare Todos
   const [todos, setTodos] = useState(Data)
+  const router = useRouter()
 
   let todayTodos = []
   let overdueTodos = []
@@ -84,6 +86,10 @@ export default function Index() {
     setTodos(todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed } : todo))
   }
 
+  const handlePress = (id) => {
+    router.push(`/todos/${id}`)
+  }
+
   console.log("Hi")
 
   return (
@@ -127,8 +133,10 @@ export default function Index() {
                   </Pressable>
                 </View>
                 <View style={styles.todoTextContainer}>
-                  <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
-                  <Text style={{...styles.dueTimeText, ...styles.overdueTimeText}}>Overdue From {new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
+                  <Pressable onPress={() => handlePress(item.id)}>
+                    <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
+                    <Text style={{...styles.dueTimeText, ...styles.overdueTimeText}}>Overdue From {new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
+                  </Pressable>
                 </View>
                 <View style={styles.dotIconContainer}>
                   <Entypo name="dot-single" size={48} style={styles.overdueDot} />
