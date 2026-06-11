@@ -2,7 +2,7 @@ import { Data } from "@/constants/Todos.jsx";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useContext, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../context/ThemeContext";
 
@@ -20,7 +20,12 @@ export default function Index() {
   let overdueTodos = []
   let completedTodos = []
 
+  let totalTasks = 0
+  let completedTasks = 0
+
+
   for (const todo of todos) {
+    totalTasks += 1
     if (todo.completed === false && new Date(todo.dueDateTime) > new Date()) {
       todayTodos.push(todo)
     }
@@ -29,8 +34,14 @@ export default function Index() {
     }
     else {
       completedTodos.push(todo)
+      completedTasks += 1
     }
   }
+
+  let percentComplete = totalTasks == 0 ? 1 : completedTasks/totalTasks
+  percentComplete = percentComplete * 100
+  percentComplete = Math.round(percentComplete)
+  percentComplete = `${percentComplete}%`
 
   //Dynamic Sizes
   const { width } = useWindowDimensions();
@@ -45,7 +56,7 @@ export default function Index() {
 
   //Declare colors + themes
   const { colorScheme, setColorScheme ,theme } = useContext(ThemeContext)
-  const styles = createStyles(theme, colorScheme, fontSize, secondFontSize)
+  const styles = createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete)
 
   //Font
   const [loaded, error] = useFonts(Quicksand_500Medium)
@@ -55,7 +66,7 @@ export default function Index() {
     return null
   }
 
-  console.log("Hi")
+  console.log("Hello")
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,85 +74,93 @@ export default function Index() {
         <Text style={styles.helloText}>Good Morning Josh</Text>
         <Text style={styles.bigText}>Your Tasks</Text>
       </View>
-      <View style={styles.overdueTasksContainer}>
-        <Text style={styles.todosSubheaderText}>Overdue Tasks</Text>
-        <FlatList
-          data={overdueTodos}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.contentContainer}
-          ListEmptyComponent={<Text>No items</Text>}
-          renderItem={({ item }) => (
-            <View style={{ ...styles.row, ...styles.overdueContainer}}>
-              <View style={styles.todoIconContainer}>
-                <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.overdueCircleIcon}/>
-              </View>
-              <View style={styles.todoTextContainer}>
-                <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
-                <Text style={{...styles.dueTimeText, ...styles.overdueTimeText}}>Overdue From {new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
-              </View>
-              <View style={styles.dotIconContainer}>
-                <Entypo name="dot-single" size={48} style={styles.overdueDot} />
-              </View>
-            </View>
-
-          )}
-        />
+      <View style={styles.progBarContainer}>
+        <View style={styles.progBarBack}>
+          <View style={styles.progBar}>
+            <Text style={styles.progBarText}>{completedTasks} out of {totalTasks}</Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.dueTodayTasksContainer}>
-        <Text style={styles.todosSubheaderText}>Today</Text>
-        <FlatList
-          data={todayTodos}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.contentContainer}
-          ListEmptyComponent={<Text>No items</Text>}
-          renderItem={({ item }) => (
-            <View style={styles.row}>
-              <View style={styles.todoIconContainer}>
-                <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.overdueTasksContainer}>
+          <Text style={styles.todosSubheaderText}>Overdue Tasks</Text>
+          <FlatList
+            data={overdueTodos}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.contentContainer}
+            ListEmptyComponent={<Text>No items</Text>}
+            renderItem={({ item }) => (
+              <View style={{ ...styles.row, ...styles.overdueContainer}}>
+                <View style={styles.todoIconContainer}>
+                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.overdueCircleIcon}/>
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
+                  <Text style={{...styles.dueTimeText, ...styles.overdueTimeText}}>Overdue From {new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.overdueDot} />
+                </View>
               </View>
-              <View style={styles.todoTextContainer}>
-                <Text style={styles.todoTitleText} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
-                <Text style={styles.dueTimeText}>{new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
-              </View>
-              <View style={styles.dotIconContainer}>
-                <Entypo name="dot-single" size={48} style={styles.dot} />
-              </View>
-            </View>
 
-          )}
-        />
-      </View>
-      <View style={styles.completedTasksContainter}>
-        <Text style={styles.todosSubheaderText}>Completed</Text>
-        <FlatList
-          data={completedTodos}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.contentContainer}
-          ListEmptyComponent={<Text>No items</Text>}
-          renderItem={({ item }) => (
-            <View style={styles.row}>
-              <View style={styles.todoIconContainer}>
-                <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+            )}
+          />
+        </View>
+        <View style={styles.dueTodayTasksContainer}>
+          <Text style={styles.todosSubheaderText}>Today</Text>
+          <FlatList
+            data={todayTodos}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.contentContainer}
+            ListEmptyComponent={<Text>No items</Text>}
+            renderItem={({ item }) => (
+              <View style={styles.row}>
+                <View style={styles.todoIconContainer}>
+                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={styles.todoTitleText} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
+                  <Text style={styles.dueTimeText}>{new Date(item.dueDateTime).toLocaleTimeString("en-AU", {hour: "numeric",minute: "2-digit"})}</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.dot} />
+                </View>
               </View>
-              <View style={styles.todoTextContainer}>
-                <Text style={{...styles.todoTitleText, ...styles.completedTodoText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
-                <Text style={styles.dueTimeText}>Done</Text>
-              </View>
-              <View style={styles.dotIconContainer}>
-                <Entypo name="dot-single" size={48} style={styles.doneDot} />
-              </View>
-            </View>
 
-          )}
-        />
-      </View>
+            )}
+          />
+        </View>
+        <View style={styles.completedTasksContainter}>
+          <Text style={styles.todosSubheaderText}>Completed</Text>
+          <FlatList
+            data={completedTodos}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.contentContainer}
+            ListEmptyComponent={<Text>No items</Text>}
+            renderItem={({ item }) => (
+              <View style={styles.row}>
+                <View style={styles.todoIconContainer}>
+                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={{...styles.todoTitleText, ...styles.completedTodoText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
+                  <Text style={styles.dueTimeText}>Done</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.doneDot} />
+                </View>
+              </View>
 
+            )}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 
-function createStyles(theme, colorScheme, fontSize, secondFontSize) {
+function createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete) {
   return StyleSheet.create({
     container:{
       flex: 1,
@@ -155,7 +174,8 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize) {
       borderWidth: 1,
       borderRadius: 20,
       backgroundColor: theme.card,
-      marginHorizontal: 'auto'
+      marginHorizontal: 'auto',
+      marginBottom: 5
     },
     todoIconContainer: {
       width: 50,
@@ -226,7 +246,8 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize) {
       fontSize: 34,
       paddingTop: 6,
       fontFamily: 'Quicksand_500Medium',
-      paddingLeft: "8%"
+      paddingLeft: "8%",
+      marginBottom: 10
     },
     todosSubheaderText: {
       color: theme.secondaryText,
@@ -236,5 +257,38 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize) {
       fontFamily: 'Quicksand_500Medium',
       paddingLeft: "8%"
     },
+    progBarContainer: {
+      width: "85%",
+      backgroundColor: theme.card,
+      height: 40,
+      marginHorizontal: "auto",
+      borderRadius: 20,
+      marginBottom: 10
+    },
+    progBarBack: {
+      backgroundColor: theme.progressTrack,
+      width: "95%",
+      height: 20,
+      marginHorizontal: "auto",
+      marginVertical: "auto",
+      borderRadius: 20
+    },
+    progBar: {
+      backgroundColor: theme.progressFill,
+      width: percentComplete,
+      height: 20,
+      borderRadius: 20,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    progBarText: {
+      color: theme.text,
+      fontSize: 13,
+      fontFamily: 'Quicksand_500Medium',
+      paddingLeft: "8%"
+    },
+    scrollView: {
+      flex: 1
+    }
   })
 }
