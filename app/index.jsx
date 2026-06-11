@@ -2,7 +2,7 @@ import { Data } from "@/constants/Todos.jsx";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useContext, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../context/ThemeContext";
 
@@ -80,6 +80,10 @@ export default function Index() {
     return null
   }
 
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed } : todo))
+  }
+
   console.log("Hi")
 
   return (
@@ -90,8 +94,8 @@ export default function Index() {
       </View>
       <View style={styles.progBarContainer}>
         <View style={styles.progBarBack}>
+          <Text style={styles.progBarText}>{percentageText}</Text>
           <View style={styles.progBar}>
-            <Text style={styles.progBarText}>{percentageText}</Text>
           </View>
         </View>
       </View>
@@ -102,11 +106,25 @@ export default function Index() {
             data={overdueTodos}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.contentContainer}
-            ListEmptyComponent={<Text>No items</Text>}
+            ListEmptyComponent={
+              <View style={styles.row}>
+                <View style={styles.todoIconContainer}>
+                  <AntDesign name="check-circle" size={24} style={styles.circleIcon} />
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={{...styles.todoTitleText, marginBottom: 15}}>Your all up to date</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.doneDot} />
+                </View>
+              </View>
+              }
             renderItem={({ item }) => (
               <View style={{ ...styles.row, ...styles.overdueContainer}}>
                 <View style={styles.todoIconContainer}>
-                  <Feather name="alert-circle" size={24} style={styles.overdueCircleIcon} />
+                  <Pressable onPress={() => toggleTodo(item.id)}>
+                    <Feather name="alert-circle" size={24} style={styles.overdueCircleIcon} />
+                  </Pressable>
                 </View>
                 <View style={styles.todoTextContainer}>
                   <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
@@ -126,11 +144,25 @@ export default function Index() {
             data={todayTodos}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.contentContainer}
-            ListEmptyComponent={<Text>No items</Text>}
+            ListEmptyComponent={
+              <View style={styles.row}>
+                <View style={styles.todoIconContainer}>
+                  <AntDesign name="check-circle" size={24} style={styles.circleIcon} />
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={{...styles.todoTitleText, marginBottom: 12}}>You have no tasks to do today</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.doneDot} />
+                </View>
+              </View>
+              }
             renderItem={({ item }) => (
               <View style={styles.row}>
                 <View style={styles.todoIconContainer}>
-                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+                  <Pressable onPress={() => toggleTodo(item.id)}>
+                    <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+                  </Pressable>
                 </View>
                 <View style={styles.todoTextContainer}>
                   <Text style={styles.todoTitleText} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
@@ -150,11 +182,25 @@ export default function Index() {
             data={completedTodos}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.contentContainer}
-            ListEmptyComponent={<Text>No items</Text>}
-            renderItem={({ item }) => (
+            ListEmptyComponent={
               <View style={styles.row}>
                 <View style={styles.todoIconContainer}>
                   <AntDesign name="check-circle" size={24} style={styles.circleIcon} />
+                </View>
+                <View style={styles.todoTextContainer}>
+                  <Text style={{...styles.todoTitleText, marginBottom: 12}}>No Completed Tasks</Text>
+                </View>
+                <View style={styles.dotIconContainer}>
+                  <Entypo name="dot-single" size={48} style={styles.doneDot} />
+                </View>
+              </View>
+              }
+            renderItem={({ item }) => (
+              <View style={styles.row}>
+                <View style={styles.todoIconContainer}>
+                  <Pressable onPress={() => toggleTodo(item.id)}>
+                    <AntDesign name="check-circle" size={24} style={styles.circleIcon} />
+                  </Pressable>
                 </View>
                 <View style={styles.todoTextContainer}>
                   <Text style={{...styles.todoTitleText, ...styles.completedTodoText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
@@ -246,7 +292,7 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize, percentCompl
       color: theme.secondaryText
     },
     doneDot:{
-      color: theme.card
+      color: theme.progressTrack
     },
     helloText: {
       color: theme.secondaryText,
@@ -285,24 +331,34 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize, percentCompl
       height: 20,
       marginHorizontal: "auto",
       marginVertical: "auto",
-      borderRadius: 20
+      borderRadius: 20,
+      justifyContent: "center",
+      alignItems: "center"
     },
     progBar: {
       backgroundColor: progBarColor,
       width: percentComplete,
       height: 20,
       borderRadius: 20,
-      justifyContent: "center",
-      alignItems: "center"
+      position: "absolute",
+      alignSelf: "flex-start"
     },
     progBarText: {
       color: theme.text,
       fontSize: 13,
       fontFamily: 'Quicksand_500Medium',
-      paddingLeft: "8%"
+      zIndex: 1
     },
     scrollView: {
       flex: 1
+    },
+    noItemsText: {
+      color: theme.text,
+      fontSize: 34,
+      paddingTop: 20,
+      fontFamily: 'Quicksand_500Medium',
+      paddingLeft: "8%",
+      marginBottom: 10
     }
   })
 }
