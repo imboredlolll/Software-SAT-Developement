@@ -8,6 +8,8 @@ import { ThemeContext } from "../context/ThemeContext";
 
 import { Quicksand_500Medium } from '@expo-google-fonts/quicksand/500Medium';
 import { useFonts } from '@expo-google-fonts/quicksand/useFonts';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
 import { useWindowDimensions } from 'react-native';
 
 
@@ -92,7 +94,7 @@ export default function Index() {
             renderItem={({ item }) => (
               <View style={{ ...styles.row, ...styles.overdueContainer}}>
                 <View style={styles.todoIconContainer}>
-                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.overdueCircleIcon}/>
+                  <Feather name="alert-circle" size={24} style={styles.overdueCircleIcon} />
                 </View>
                 <View style={styles.todoTextContainer}>
                   <Text style={{...styles.todoTitleText, ...styles.overdueTodoTitleText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
@@ -140,7 +142,7 @@ export default function Index() {
             renderItem={({ item }) => (
               <View style={styles.row}>
                 <View style={styles.todoIconContainer}>
-                  <MaterialCommunityIcons name="checkbox-blank-circle-outline" size={24} style={styles.circleIcon}/>
+                  <AntDesign name="check-circle" size={24} style={styles.circleIcon} />
                 </View>
                 <View style={styles.todoTextContainer}>
                   <Text style={{...styles.todoTitleText, ...styles.completedTodoText}} numberOfLines={1} adjustsFontSizeToFit>{item.title}</Text>
