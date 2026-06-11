@@ -45,6 +45,8 @@ export default function Index() {
   percentComplete = Math.round(percentComplete)
   percentComplete = `${percentComplete}%`
 
+
+
   //Dynamic Sizes
   const { width } = useWindowDimensions();
   let fontSize = Math.max(20, width * 0.04);
@@ -58,7 +60,17 @@ export default function Index() {
 
   //Declare colors + themes
   const { colorScheme, setColorScheme ,theme } = useContext(ThemeContext)
-  const styles = createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete)
+
+  let progBarColor = theme.progressFill
+
+  let percentageText = `${completedTasks} out of ${totalTasks}`
+
+  if (completedTasks === 0) {
+    percentComplete = `100%`
+    progBarColor = theme.progressTrack
+  }
+
+  const styles = createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete, progBarColor)
 
   //Font
   const [loaded, error] = useFonts(Quicksand_500Medium)
@@ -68,7 +80,7 @@ export default function Index() {
     return null
   }
 
-  console.log("Hello")
+  console.log("Hi")
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,7 +91,7 @@ export default function Index() {
       <View style={styles.progBarContainer}>
         <View style={styles.progBarBack}>
           <View style={styles.progBar}>
-            <Text style={styles.progBarText}>{completedTasks} out of {totalTasks}</Text>
+            <Text style={styles.progBarText}>{percentageText}</Text>
           </View>
         </View>
       </View>
@@ -162,7 +174,7 @@ export default function Index() {
 }
 
 
-function createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete) {
+function createStyles(theme, colorScheme, fontSize, secondFontSize, percentComplete, progBarColor) {
   return StyleSheet.create({
     container:{
       flex: 1,
@@ -276,7 +288,7 @@ function createStyles(theme, colorScheme, fontSize, secondFontSize, percentCompl
       borderRadius: 20
     },
     progBar: {
-      backgroundColor: theme.progressFill,
+      backgroundColor: progBarColor,
       width: percentComplete,
       height: 20,
       borderRadius: 20,
