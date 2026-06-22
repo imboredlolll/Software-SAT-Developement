@@ -21,7 +21,7 @@ export default function EditScreen() {
         return null
     }
 
-    const styles = createStyles(theme, colorScheme)
+    // const styles = createStyles(theme, colorScheme)
 
     useEffect(() => {
 

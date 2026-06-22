@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { useContext, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "../../context/ThemeContext";
 
 import { Quicksand_500Medium } from '@expo-google-fonts/quicksand/500Medium';
 import { useFonts } from '@expo-google-fonts/quicksand/useFonts';
